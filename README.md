@@ -1,24 +1,34 @@
-# README
+# rails-template
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A template for a modern Rails app
 
-Things you may want to cover:
+## Design goals
 
-* Ruby version
+1. Support good practice for development and devops
+1. Allow users to register and verify an account
+1. Templated UI
 
-* System dependencies
+## Installation
 
-* Configuration
+[Install Yarn](https://yarnpkg.com/lang/en/docs/install)
 
-* Database creation
+### Debian / Ubuntu
 
-* Database initialization
+1. `sudo apt-get install libpq-dev`
+1. `bundle install`
 
-* How to run the test suite
+### RedHat / CentOS
 
-* Services (job queues, cache servers, search engines, etc.)
+1. `sudo yum install postgresql-devel`
+1. `bundle install`
 
-* Deployment instructions
+### MacOS
 
-* ...
+1. `brew install postgresql`
+1. `bundle install`
+
+## Notes
+
+### Credentials
+
+The credentials file only contains `secret_key_base`. Other secrets and configuration settings are managed with environment variables.
