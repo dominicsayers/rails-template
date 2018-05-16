@@ -11,3 +11,6 @@
 /public/assets
 .byebug_history
 /config/master.key
+
+.env.development.local
+.env.test.local
