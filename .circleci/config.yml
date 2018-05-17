@@ -1,0 +1,113 @@
+---
+version: 2
+
+docker_image: &docker_image
+  image: circleci/ruby:latest-node-browsers
+
+restore_repo: &restore_repo
+  restore_cache:
+    keys:
+      - v1-repo-{{ .Branch }}-{{ .Revision }}
+      - v1-repo-{{ .Branch }}
+      - v1-repo
+
+restore_bundle: &restore_bundle
+  restore_cache:
+    keys:
+      - v1-bundle-{{ checksum "Gemfile.lock" }}-{{ checksum "yarn.lock" }}
+      - v1-bundle
+
+jobs:
+  checkout_code:
+    docker:
+      - <<: *docker_image
+    steps:
+      - *restore_repo
+      - checkout
+      - save_cache:
+          key: v1-repo-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .
+
+  bundle:
+    docker:
+      - <<: *docker_image
+        environment:
+          BUNDLE_SILENCE_ROOT_WARNING: "true"
+          RAILS_ENV: test
+          NODE_ENV: test
+    steps:
+      - *restore_repo
+      - checkout
+      - *restore_bundle
+      - run: gem update bundler
+      - run: bundle config set path 'vendor/bundle'
+      - run: bundle install --jobs=4 --retry=3
+      - run: yarn install
+      - run: bin/rails webpacker:compile
+      - save_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}-{{ checksum "yarn.lock" }}
+          paths:
+            - vendor/bundle
+            - public/packs-test
+
+  rubocop:
+    docker:
+      - <<: *docker_image
+    steps:
+      - *restore_repo
+      - *restore_bundle
+      - run: gem update bundler
+      - run: bundle config set path 'vendor/bundle'
+      - run: bundle check
+      - run: bin/rubocop
+
+  rspec:
+    docker:
+      - <<: *docker_image
+        environment:
+          PGHOST: 127.0.0.1
+          PGUSER: postgres
+          RAILS_ENV: test
+          NODE_ENV: test
+      - image: circleci/postgres
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+    steps:
+      - *restore_repo
+      - *restore_bundle
+      - run: gem update bundler
+      - run: bundle config set path 'vendor/bundle'
+      - run: bundle check
+      - run: dockerize -wait tcp://127.0.0.1:5432 -timeout 120s
+      - run: bundle exec rake db:create
+      - run: bundle exec rake db:schema:load
+      - run:
+          command: |
+            mkdir /tmp/test-results
+            bundle exec rspec \
+              --format RspecJunitFormatter \
+              --out /tmp/test-results/rspec.xml \
+              --format progress \
+              $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - checkout_code
+      - bundle:
+          requires:
+            - checkout_code
+      - rubocop:
+          requires:
+            - bundle
+      - rspec:
+          requires:
+            - bundle
