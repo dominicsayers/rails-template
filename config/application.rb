@@ -22,5 +22,7 @@ module RailsTemplate
     config.application_name = parent_name
     config.application_slug = config.application_name.underscore
     config.application_title = config.application_slug.humanize
+
+    config.action_mailer.default_url_options = { host: ENV['APP_HOST'] }
   end
 end
