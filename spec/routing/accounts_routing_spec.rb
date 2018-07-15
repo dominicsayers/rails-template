@@ -43,6 +43,7 @@ RSpec.describe AccountsController, type: :routing do
     it 'routes when routable' do
       all_paths_and_routes do |path, http_method|
         next unless (routing = routable.dig(path, http_method))
+
         expect(http_method => path).to route_to(routing.delete(:route), routing)
       end
     end
@@ -50,6 +51,7 @@ RSpec.describe AccountsController, type: :routing do
     it 'is unroutable otherwise' do
       all_paths_and_routes do |path, http_method|
         next if routable.dig(path, http_method)
+
         expect(http_method => path).not_to be_routable
       end
     end

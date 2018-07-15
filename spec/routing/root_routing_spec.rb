@@ -1,11 +1,35 @@
 # frozen_string_literal: true
 
 RSpec.describe ApplicationController, type: :routing do
-  it 'routes GET / to the home page' do
-    http_get_methods.each { |http_method| expect(http_method => '/').to route_to('pages#home') }
+  context 'with non-account subdomain' do
+    let(:url) { 'https://www.example.com' }
+
+    it 'routes GET / to the home page' do
+      http_get_methods.each do |http_get_method|
+        expect(http_get_method => url).to route_to('pages#home')
+      end
+    end
+
+    it 'does not route non-GET /' do
+      http_non_get_methods.each do |http_non_get_method|
+        expect(http_non_get_method => url).not_to be_routable
+      end
+    end
   end
 
-  it 'does not route other methods /' do
-    http_non_get_methods.each { |http_method| expect(http_method => '/').not_to be_routable }
+  context 'with account subdomain' do
+    let(:url) { 'https://foo.example.com' }
+
+    it 'routes GET / to the account home page' do
+      http_get_methods.each do |http_get_method|
+        expect(http_get_method => url).to route_to('accounts#home')
+      end
+    end
+
+    it 'does not route non-GET /' do
+      http_non_get_methods.each do |http_non_get_method|
+        expect(http_non_get_method => url).not_to be_routable
+      end
+    end
   end
 end
