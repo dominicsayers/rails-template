@@ -2,14 +2,21 @@
 
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  devise_for :users
-  root to: 'pages#home'
+  constraints SubdomainConstraints::NotAccount do
+    root to: 'pages#home', as: :no_account_root
 
-  authenticate :user do
-    resources :accounts
+    devise_for :users
+
+    resources :users, only: :show do
+      get 'public', on: :member
+    end
+
+    authenticate :user do
+      resources :accounts
+    end
   end
 
-  resources :users do
-    get 'public', on: :member
+  constraints SubdomainConstraints::Account do
+    root to: 'accounts#home', as: :account_root
   end
 end
