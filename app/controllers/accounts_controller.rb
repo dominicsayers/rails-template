@@ -1,19 +1,19 @@
+# frozen_string_literal: true
+
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :edit, :update, :destroy]
+  before_action :set_account, only: %i[show edit update destroy]
 
   def index
     @accounts = Account.all
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @account = Account.new
   end
 
-  def edit
-  end
+  def edit; end
 
   def create
     @account = Account.new(account_params)
