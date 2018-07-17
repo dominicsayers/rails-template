@@ -42,7 +42,7 @@ RSpec.describe AccountsController, type: :controller do
 
   describe 'GET #index' do
     it 'returns a success response' do
-      Account.create! valid_attributes
+      create :account, valid_attributes
       get :index, params: {}, session: valid_session
       expect(response).to be_successful
     end
@@ -50,7 +50,7 @@ RSpec.describe AccountsController, type: :controller do
 
   describe 'GET #show' do
     it 'returns a success response' do
-      account = Account.create! valid_attributes
+      account = create :account, valid_attributes
       get :show, params: { id: account.to_param }, session: valid_session
       expect(response).to be_successful
     end
@@ -65,7 +65,7 @@ RSpec.describe AccountsController, type: :controller do
 
   describe 'GET #edit' do
     it 'returns a success response' do
-      account = Account.create! valid_attributes
+      account = create :account, valid_attributes
       get :edit, params: { id: account.to_param }, session: valid_session
       expect(response).to be_successful
     end
@@ -100,14 +100,14 @@ RSpec.describe AccountsController, type: :controller do
       end
 
       it 'updates the requested account' do
-        account = Account.create! valid_attributes
+        account = create :account, valid_attributes
         put :update, params: { id: account.to_param, account: new_attributes }, session: valid_session
         account.reload
         skip('Add assertions for updated state')
       end
 
       it 'redirects to the account' do
-        account = Account.create! valid_attributes
+        account = create :account, valid_attributes
         put :update, params: { id: account.to_param, account: valid_attributes }, session: valid_session
         expect(response).to redirect_to(account)
       end
@@ -115,7 +115,7 @@ RSpec.describe AccountsController, type: :controller do
 
     context 'with invalid params' do
       it "returns a success response (i.e. to display the 'edit' template)" do
-        account = Account.create! valid_attributes
+        account = create :account, valid_attributes
         put :update, params: { id: account.to_param, account: invalid_attributes }, session: valid_session
         expect(response).to be_successful
       end
@@ -124,14 +124,14 @@ RSpec.describe AccountsController, type: :controller do
 
   describe 'DELETE #destroy' do
     it 'destroys the requested account' do
-      account = Account.create! valid_attributes
+      account = create :account, valid_attributes
       expect do
         delete :destroy, params: { id: account.to_param }, session: valid_session
       end.to change(Account, :count).by(-1)
     end
 
     it 'redirects to the accounts list' do
-      account = Account.create! valid_attributes
+      account = create :account, valid_attributes
       delete :destroy, params: { id: account.to_param }, session: valid_session
       expect(response).to redirect_to(accounts_url)
     end
