@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
 RSpec.describe 'accounts/new', type: :view do
   before do
-    assign(:account, Account.new)
+    assign(:account, build(:account))
   end
 
   it 'renders new account form' do

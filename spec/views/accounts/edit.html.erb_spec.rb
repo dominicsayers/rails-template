@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
 RSpec.describe 'accounts/edit', type: :view do
-  let(:account) { assign(:account, Account.create!) }
+  let(:account) { create(:account) }
 
   it 'renders the edit account form' do
+    assign(:account, account)
     render
 
     assert_select 'form[action=?][method=?]', account_path(account), 'post' do

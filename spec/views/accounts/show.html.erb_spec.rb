@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
 RSpec.describe 'accounts/show', type: :view do
-  before do
-    @account = assign(:account, Account.create!)
-  end
+  let(:account) { create(:account) }
 
   it 'renders attributes in <p>' do
+    assign(:account, account)
     render
   end
 end
