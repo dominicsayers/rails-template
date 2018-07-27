@@ -23,6 +23,12 @@ RSpec.describe '/accounts', type: :request do
     skip('Add a hash of attributes invalid for your model')
   end
 
+  let(:user) { FactoryBot.create(:user) }
+
+  before { sign_in(user) }
+
+  after { sign_out(user) }
+
   describe 'GET /index' do
     it 'renders a successful response' do
       Account.create! valid_attributes

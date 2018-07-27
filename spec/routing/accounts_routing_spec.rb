@@ -1,37 +1,69 @@
 # frozen_string_literal: true
 
 RSpec.describe AccountsController, type: :routing do
-  describe 'routing' do
-    it 'routes to #index' do
-      expect(get: '/accounts').to route_to('accounts#index')
+  let(:routable) do
+    {
+      '/accounts' => {
+        'GET' => { route: 'accounts#index' },
+        'HEAD' => { route: 'accounts#index' },
+        'POST' => { route: 'accounts#create' },
+      },
+      '/accounts/new' => {
+        'DELETE' => { route: 'accounts#destroy', id: 'new' }, # TODO: Rails bug?
+        'GET' => { route: 'accounts#new' },
+        'HEAD' => { route: 'accounts#new' },
+        'PATCH' => { route: 'accounts#update', id: 'new' }, # TODO: Rails bug?
+        'PUT' => { route: 'accounts#update', id: 'new' }, # TODO: Rails bug?
+      },
+      '/accounts/1' => {
+        'DELETE' => { route: 'accounts#destroy', id: '1' },
+        'GET' => { route: 'accounts#show', id: '1' },
+        'HEAD' => { route: 'accounts#show', id: '1' },
+        'PATCH' => { route: 'accounts#update', id: '1' },
+        'PUT' => { route: 'accounts#update', id: '1' },
+      },
+      '/accounts/1/edit' => {
+        'GET' => { route: 'accounts#edit', id: '1' },
+        'HEAD' => { route: 'accounts#edit', id: '1' },
+      },
+    }
+  end
+
+  def all_paths_and_routes
+    routable.each_key do |path|
+      HTTPMethods.all.each do |http_method|
+        yield path, http_method
+      end
+    end
+  end
+
+  context 'when user is authenticated' do
+    before { authenticated?(true) }
+
+    it 'routes when routable' do
+      all_paths_and_routes do |path, http_method|
+        next unless (routing = routable.dig(path, http_method))
+
+        expect(http_method => path).to route_to(routing.delete(:route), routing)
+      end
     end
 
-    it 'routes to #new' do
-      expect(get: '/accounts/new').to route_to('accounts#new')
-    end
+    it 'is unroutable otherwise' do
+      all_paths_and_routes do |path, http_method|
+        next if routable.dig(path, http_method)
 
-    it 'routes to #show' do
-      expect(get: '/accounts/1').to route_to('accounts#show', id: '1')
+        expect(http_method => path).not_to be_routable
+      end
     end
+  end
 
-    it 'routes to #edit' do
-      expect(get: '/accounts/1/edit').to route_to('accounts#edit', id: '1')
-    end
+  context 'when no user is authenticated' do
+    before { authenticated?(false) }
 
-    it 'routes to #create' do
-      expect(post: '/accounts').to route_to('accounts#create')
-    end
-
-    it 'routes to #update via PUT' do
-      expect(put: '/accounts/1').to route_to('accounts#update', id: '1')
-    end
-
-    it 'routes to #update via PATCH' do
-      expect(patch: '/accounts/1').to route_to('accounts#update', id: '1')
-    end
-
-    it 'routes to #destroy' do
-      expect(delete: '/accounts/1').to route_to('accounts#destroy', id: '1')
+    it 'is unroutable' do
+      all_paths_and_routes do |path, http_method|
+        expect(http_method => path).not_to be_routable
+      end
     end
   end
 end
