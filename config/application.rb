@@ -18,5 +18,9 @@ module RailsTemplate
   class Application < Rails::Application
     config.load_defaults 5.2
     config.generators.system_tests = nil
+
+    config.application_name = parent_name
+    config.application_slug = config.application_name.underscore
+    config.application_title = config.application_slug.humanize
   end
 end
