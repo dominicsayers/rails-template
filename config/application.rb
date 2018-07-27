@@ -33,5 +33,9 @@ module RailsTemplate
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.application_name = module_parent_name
+    config.application_slug = config.application_name.underscore
+    config.application_title = config.application_slug.humanize
   end
 end
