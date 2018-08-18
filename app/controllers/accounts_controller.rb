@@ -56,6 +56,6 @@ class AccountsController < ApplicationController
   end
 
   def account_params
-    params.fetch(:account, {})
+    params.require(:account).permit(:name, :subdomain)
   end
 end
