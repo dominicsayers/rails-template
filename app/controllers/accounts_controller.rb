@@ -70,6 +70,6 @@ class AccountsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def account_params
-    params.fetch(:account, {})
+    params.require(:account).permit(:name, :subdomain)
   end
 end
