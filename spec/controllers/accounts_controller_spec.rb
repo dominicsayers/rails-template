@@ -28,17 +28,28 @@ RSpec.describe AccountsController, type: :controller do
   # Account. As you add validations to Account, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) do
-    skip('Add a hash of attributes valid for your model')
+    {
+      name: 'foo',
+      subdomain: 'bar',
+    }
   end
 
   let(:invalid_attributes) do
-    skip('Add a hash of attributes invalid for your model')
+    {
+      foo: 'bar',
+    }
   end
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # AccountsController. Be sure to keep this updated too.
   let(:valid_session) { {} }
+
+  let(:user) { FactoryBot.create(:user) }
+
+  before { sign_in(user) }
+
+  after { sign_out(user) }
 
   describe 'GET #index' do
     it 'returns a success response' do
@@ -87,8 +98,9 @@ RSpec.describe AccountsController, type: :controller do
 
     context 'with invalid params' do
       it "returns a success response (i.e. to display the 'new' template)" do
-        post :create, params: { account: invalid_attributes }, session: valid_session
-        expect(response).to be_successful
+        expect do
+          post :create, params: { account: invalid_attributes }, session: valid_session
+        end.to raise_error(ActiveRecord::NotNullViolation)
       end
     end
   end
@@ -96,14 +108,17 @@ RSpec.describe AccountsController, type: :controller do
   describe 'PUT #update' do
     context 'with valid params' do
       let(:new_attributes) do
-        skip('Add a hash of attributes valid for your model')
+        {
+          name: 'foo',
+          subdomain: 'baz',
+        }
       end
 
       it 'updates the requested account' do
         account = create :account, valid_attributes
         put :update, params: { id: account.to_param, account: new_attributes }, session: valid_session
         account.reload
-        skip('Add assertions for updated state')
+        expect(account.subdomain).to eq('baz')
       end
 
       it 'redirects to the account' do
@@ -114,10 +129,10 @@ RSpec.describe AccountsController, type: :controller do
     end
 
     context 'with invalid params' do
-      it "returns a success response (i.e. to display the 'edit' template)" do
+      it 'redirects to the account' do
         account = create :account, valid_attributes
         put :update, params: { id: account.to_param, account: invalid_attributes }, session: valid_session
-        expect(response).to be_successful
+        expect(response).to redirect_to(account)
       end
     end
   end
