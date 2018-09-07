@@ -23,6 +23,8 @@ module RailsTemplate
     config.application_slug = config.application_name.underscore
     config.application_title = config.application_slug.humanize
 
+    config.action_controller.include_all_helpers = false
+
     config.action_mailer.default_url_options = { host: ENV['APP_HOST'] }
   end
 end
