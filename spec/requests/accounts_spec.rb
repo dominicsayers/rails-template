@@ -35,6 +35,12 @@ RSpec.describe '/accounts', type: :request do
       get accounts_url
       expect(response).to be_successful
     end
+
+    it 'shows the accounts' do
+      account = FactoryBot.create(:account)
+      get accounts_path
+      expect(response.body).to include(account.name)
+    end
   end
 
   describe 'GET /show' do
