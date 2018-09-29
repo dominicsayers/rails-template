@@ -8,9 +8,10 @@ RSpec.describe 'Accounts', type: :request do
 
     after { sign_out(user) }
 
-    it 'works! (now write some real specs)' do
+    it 'shows the accounts' do
+      account = FactoryBot.create(:account)
       get accounts_path
-      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(account.name)
     end
   end
 end
