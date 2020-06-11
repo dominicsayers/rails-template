@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :edit, :update, :destroy]
+  before_action :set_account, only: %i[show edit update destroy]
 
   # GET /accounts
   # GET /accounts.json
@@ -9,8 +11,7 @@ class AccountsController < ApplicationController
 
   # GET /accounts/1
   # GET /accounts/1.json
-  def show
-  end
+  def show; end
 
   # GET /accounts/new
   def new
@@ -18,8 +19,7 @@ class AccountsController < ApplicationController
   end
 
   # GET /accounts/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /accounts
   # POST /accounts.json
@@ -62,13 +62,14 @@ class AccountsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_account
-      @account = Account.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def account_params
-      params.fetch(:account, {})
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_account
+    @account = Account.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def account_params
+    params.fetch(:account, {})
+  end
 end
